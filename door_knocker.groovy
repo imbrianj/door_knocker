@@ -12,32 +12,32 @@ preferences {
   }
 
   section("Knock Delay (defaults to 5s)?") {
-    input name: "knockDelay", type: "decimal", title: "How Long?", required: false
+    input name: "knockDelay", type: "number", title: "How Long?", required: false
   }
 }
 
 def installed() {
-  state.lastOpen = now()
-  subscribe(multi, "acceleration.active", handleEvent)
-  subscribe(multi, "contact.open", doorOpen)
+  init()
 }
 
 def updated() {
   unsubscribe()
-  doorOpen()
-  subscribe(multi, "acceleration.active", handleEvent)
-  subscribe(multi, "contact.open", doorOpen)
+  init()
 }
 
-def doorOpen(evt) {
-  state.lastOpen = now()
+def init() {
+  state.lastClosed = now()
+  subscribe(multi, "acceleration.active", handleEvent)
+  subscribe(multi, "contact.closed", doorClosed)
+}
+
+def doorClosed(evt) {
+  state.lastClosed = now()
 }
 
 def doorKnock() {
-  def now = now()
-
-  if((multi.latestValue("contact") == "closed") ||
-     (now - (60 * 1000) > state.lastOpen)) {
+  if((multi.latestValue("contact") == "closed") &&
+     (now() - (60 * 1000) > state.lastClosed)) {
     log.debug "${multi.label ?: multi.name} detected a knocked."
     sendPush("${multi.label ?: multi.name} detected a knock")
   }
