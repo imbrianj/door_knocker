@@ -1,9 +1,11 @@
 /**
- *  Let me know when someone knocks on the door, but ignore
- *  when someone is opening the door.
+ *  Door Knocker
  *
  *  Author: brian@bevey.org
- *  Date: 9/5/13
+ *  Date: 9/10/13
+ *
+ *  Let me know when someone knocks on the door, but ignore
+ *  when someone is opening the door.
  */
 
 preferences {
@@ -38,12 +40,12 @@ def doorClosed(evt) {
 def doorKnock() {
   if((multi.latestValue("contact") == "closed") &&
      (now() - (60 * 1000) > state.lastClosed)) {
-    log.debug "${multi.label ?: multi.name} detected a knocked."
-    sendPush("${multi.label ?: multi.name} detected a knock")
+    log.debug("${multi.label ?: multi.name} detected a knock.")
+    sendPush("${multi.label ?: multi.name} detected a knock.")
   }
 
   else {
-    log.debug "${multi.label ?: multi.name} knocked, but looks like it was just someone opening the door."
+    log.debug("${multi.label ?: multi.name} knocked, but looks like it was just someone opening the door.")
   }
 }
 
