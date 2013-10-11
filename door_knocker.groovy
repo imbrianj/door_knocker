@@ -10,7 +10,11 @@
 
 preferences {
   section("When Someone Knocks?") {
-    input name: "multi", type: "device.SmartSenseMulti", title: "Where?"
+    input name: "knockSensor", type: "capability.accelerationSensor", title: "Where?"
+  }
+
+  section("But not when they open this door?") {
+    input name: "openSensor", type: "capability.contactSensor", title: "Where?"
   }
 
   section("Knock Delay (defaults to 5s)?") {
@@ -29,8 +33,8 @@ def updated() {
 
 def init() {
   state.lastClosed = now()
-  subscribe(multi, "acceleration.active", handleEvent)
-  subscribe(multi, "contact.closed", doorClosed)
+  subscribe(knockSensor, "acceleration.active", handleEvent)
+  subscribe(openSensor, "contact.closed", doorClosed)
 }
 
 def doorClosed(evt) {
@@ -38,14 +42,14 @@ def doorClosed(evt) {
 }
 
 def doorKnock() {
-  if((multi.latestValue("contact") == "closed") &&
+  if((openSensor.latestValue("contact") == "closed") &&
      (now() - (60 * 1000) > state.lastClosed)) {
-    log.debug("${multi.label ?: multi.name} detected a knock.")
-    sendPush("${multi.label ?: multi.name} detected a knock.")
+    log.debug("${knockSensor.label ?: knockSensor.name} detected a knock.")
+    sendPush("${knockSensor.label ?: knockSensor.name} detected a knock.")
   }
 
   else {
-    log.debug("${multi.label ?: multi.name} knocked, but looks like it was just someone opening the door.")
+    log.debug("${knockSensor.label ?: knockSensor.name} knocked, but looks like it was just someone opening the door.")
   }
 }
 
