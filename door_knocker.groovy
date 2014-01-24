@@ -20,6 +20,11 @@ preferences {
   section("Knock Delay (defaults to 5s)?") {
     input name: "knockDelay", type: "number", title: "How Long?", required: false
   }
+
+  section("Notifications") {
+    input "sendPushMessage", "enum", title: "Send a push notification?", metadata: [values: ["Yes", "No"]], required: false
+    input "phone", "phone", title: "Send a Text Message?", required: false
+  }
 }
 
 def installed() {
@@ -32,7 +37,7 @@ def updated() {
 }
 
 def init() {
-  state.lastClosed = now()
+  state.lastClosed = 0
   subscribe(knockSensor, "acceleration.active", handleEvent)
   subscribe(openSensor, "contact.closed", doorClosed)
 }
@@ -45,7 +50,7 @@ def doorKnock() {
   if((openSensor.latestValue("contact") == "closed") &&
      (now() - (60 * 1000) > state.lastClosed)) {
     log.debug("${knockSensor.label ?: knockSensor.name} detected a knock.")
-    sendPush("${knockSensor.label ?: knockSensor.name} detected a knock.")
+    send("${knockSensor.label ?: knockSensor.name} detected a knock.")
   }
 
   else {
@@ -56,4 +61,18 @@ def doorKnock() {
 def handleEvent(evt) {
   def delay = knockDelay ?: 5
   runIn(delay, "doorKnock")
+}
+
+private send(msg) {
+  if(sendPushMessage != "No") {
+    log.debug("Sending push message")
+    sendPush(msg)
+  }
+
+  if(phone) {
+    log.debug("Sending text message")
+    sendSms(phone, msg)
+  }
+
+  log.debug(msg)
 }
