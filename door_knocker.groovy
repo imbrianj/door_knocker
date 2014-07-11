@@ -8,6 +8,16 @@
  *  when someone is opening the door.
  */
 
+definition(
+    name: "Door Knocker",
+    namespace: "imbrianj",
+    author: "brian@bevey.org",
+    description: "Alert if door is knocked, but not opened.",
+    category: "Convenience",
+    iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
+    iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience%402x.png"
+)
+
 preferences {
   section("When Someone Knocks?") {
     input name: "knockSensor", type: "capability.accelerationSensor", title: "Where?"
